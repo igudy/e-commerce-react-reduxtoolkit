@@ -55,7 +55,6 @@ const Header = () => {
             onClick={hideMenu}
           ></div>
 
-
           <ul onClick={hideMenu}>
             <li className={styles["logo-mobile"]}>
               {logo}
