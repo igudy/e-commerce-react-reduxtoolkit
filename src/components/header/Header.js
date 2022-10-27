@@ -70,9 +70,11 @@ const Header = () => {
           </ul>
           <div className={styles["header-right"]} onClick={hideMenu}>
             <span className={styles.links}>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
-              <Link to="/order-history">My Orders</Link>
+              <NavLink to="/login" className={activeLink}>Login</NavLink>
+              <NavLink to="/register" className={activeLink}>Register</NavLink>
+              <NavLink to="/order-history" className={activeLink}>My Orders</NavLink>
+              <NavLink to="/">Logout</NavLink>
+              
             </span>
             {cart}
           </div>
