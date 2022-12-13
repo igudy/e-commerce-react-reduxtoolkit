@@ -11,6 +11,8 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { SET_ACTIVE_USER, REMOVE_ACTIVE_USER } from "../../redux/slice/authSlice";
 
+// ShowOnLogin and ShowOnLogout
+import ShowOnLogin, {ShowOnLogout } from "../hiddenLinks/hiddenLinks";
 
 const logo = (
   <div className={styles.logo}>
@@ -48,6 +50,9 @@ const Header = () => {
           const u1 = user.email.substring(0, user.email.indexOf("@"));
           const uName = u1.charAt(0).toUpperCase() + u1.slice(1);
           setDisplayName(uName);
+          // console.log(user.displayName);
+        } else{
+          setDisplayName(user.displayName);
         }
         dispatch(
           SET_ACTIVE_USER({
@@ -62,8 +67,7 @@ const Header = () => {
         dispatch(REMOVE_ACTIVE_USER());
       }
     });
-  }, [])
-
+  }, [dispatch, displayName])
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -110,7 +114,7 @@ const Header = () => {
             </li>
 
             <li>
-              <NavLink to="/" className={(state) => console.log(state)}>
+              <NavLink to="/">
                 Home
               </NavLink>
             </li>
@@ -120,22 +124,27 @@ const Header = () => {
           </ul>
           <div className={styles["header-right"]} onClick={hideMenu}>
             <span className={styles.links}>
+              <ShowOnLogout>
               <NavLink to="/login" className={activeLink}>
                 Login
               </NavLink>
-              <a href="#">
+              </ShowOnLogout>
+              <a href="#home" style={{color: "#ff7722"}}>
                 <FaUserCircle size={16} />
-                Hi, {displayName}
+                Hi, { displayName }
               </a>
-              <NavLink to="/register" className={activeLink}>
+              {/* <NavLink to="/register" className={activeLink}>
                 Register
-              </NavLink>
+              </NavLink> */}
               <NavLink to="/order-history" className={activeLink}>
                 My Orders
               </NavLink>
+              <ShowOnLogin>
               <NavLink to="/" onClick={logoutUser}>
                 Logout
               </NavLink>
+
+              </ShowOnLogin>
             </span>
             {cart}
           </div>
