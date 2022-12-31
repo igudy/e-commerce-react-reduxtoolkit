@@ -15,7 +15,8 @@ import { SET_ACTIVE_USER, REMOVE_ACTIVE_USER } from "../../redux/slice/authSlice
 import ShowOnLogin, {ShowOnLogout } from "../hiddenLinks/hiddenLinks";
 
 // Show admin if admin is logged in
-import AdminOnlyroute from "../adminOnlyRoute/AdminOnlyroute";
+import AdminOnlyroute, { AdminOnlyLink } from "../adminOnlyRoute/AdminOnlyroute";
+
 
 const logo = (
   <div className={styles.logo}>
@@ -115,12 +116,16 @@ const Header = () => {
               {logo}
               <FaTimes size={22} color="#fff" onClick={hideMenu} />
             </li>
-            
-            <AdminOnlyroute>
+
+            <AdminOnlyLink>
             <li>
-              <button className="--btn --btn-primary">Admin</button>
+              <button className="--btn --btn-primary">
+                <NavLink to="/admin/home">
+                  Admin
+                </NavLink>
+              </button>
             </li>
-            </AdminOnlyroute>
+            </AdminOnlyLink>
 
             <li>
               <NavLink to="/">

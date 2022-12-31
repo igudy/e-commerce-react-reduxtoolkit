@@ -37,12 +37,14 @@ const Slider = () => {
 
   return (
     <div className='slider'>
-        <AiOutlineArrowLeft className="arrow-prev" onClick={prevSlide}/>
-        <AiOutlineArrowRight className="arrow-next" onClick={nextSlide} />
+    <AiOutlineArrowLeft className="arrow-prev" onClick={prevSlide}/>
+    <AiOutlineArrowRight className="arrow-next" onClick={nextSlide} />
+
     {sliderData.map((slide, index)=> {
         const {image, heading, desc} = slide;
         return (
-            <div key={index} className={index===currentSlide ? "slide current" : "slide"}>                                                                    
+            <div key={index} className={index === currentSlide ? "slide current" : "slide"}>
+                
             {index === currentSlide && (
                 <>
                     <img src={image} alt="slide"/>
@@ -56,7 +58,6 @@ const Slider = () => {
                     </div>
                 </>
             )}
-
             </div>
         )
     })}
