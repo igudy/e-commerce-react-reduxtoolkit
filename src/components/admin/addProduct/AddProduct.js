@@ -1,7 +1,12 @@
 import React, {useState} from 'react';
 import styles from './AddProduct.module.scss';
 import Card from '../../cards/Card';
-import { getStorage, ref, uploadBytesResumable, uploadString } from "firebase/storage";
+import { collection, addDoc, Timestamp } from "firebase/firestore"; 
+import { db } from '../../../firebase/config'
+import { getDownloadURL, getStorage, ref, uploadBytesResumable, uploadString } from "firebase/storage";
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import Loader from '../../loader/Loader';
 
 const categories = [
   {id: 1, name:"Laptop"},
@@ -12,15 +17,24 @@ const categories = [
 
 const storage = getStorage();
 
+const initialState = {
+  name: "",
+  imageURL: "",
+  price: 0,
+  category: "",
+  brand: "",
+  desc: ""
+}
+
 const AddProduct = () => {
   const [product, setProduct] = useState({
-    name: "",
-    imageURL: "",
-    price: 0,
-    category: "",
-    brand: "",
-    desc: ""
+    ...initialState
   })
+
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const {name, value} = e.target
@@ -37,30 +51,52 @@ const AddProduct = () => {
     uploadTask.on('state_changed',
     (snapshot) => {
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      console.log('Upload is ' + progress + '% done');
-    },
+      setUploadProgress(progress);
+    }, 
     (error) => {
-      switch (error.code) {
-
-      }
+      toast.error(error.message);
     }, 
     () => {
-      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-        console.log('File available at', downloadURL);
+      getDownloadURL(uploadTask.snapshot.ref)
+      .then((downloadURL) => {
+          setProduct({...product, imageURL: downloadURL})
+          toast.message("Image uploaded successfully");
       });
     }
     );
 
-
-
+    
   };
 
   const addProduct = (e) => {
     e.preventDefault();
-    console.log(product);
+    // console.log(product);
+    setIsLoading(true);
+
+    try{
+      const docRef = addDoc(collection(db, "products"), {
+        name: product.name,
+        imageURL: product.imageURL,
+        price: Number(product.price),
+        category: product.category,
+        brand: product.brand,
+        desc: product.desc,
+        createdAt: Timestamp.now().toDate()
+      });
+      setIsLoading(false);
+      setUploadProgress(0);
+      toast.success("Product uploaded successfully");
+      navigate("/admin/all-products");
+    }
+    catch(error){
+      setIsLoading(false);
+      toast.error(error.message);
+    }
   }
 
   return (
+    <>
+    {isLoading && <Loader />}
     <div className={styles.product}>
       <form onSubmit={addProduct}>
         <h1>Add New Product</h1>
@@ -76,13 +112,18 @@ const AddProduct = () => {
 
           <label>Product Image:</label>
           <Card cardClass={styles.group}>
+          
+          {uploadProgress === 0 ? null : (
             <div className={styles.progress}>
+            
               <div className={styles['progress-bar']}
-                style={{width: "500"}}
+              style={{ width: `${uploadProgress}%`}}
               >
-                Uploading 50%
+                {uploadProgress < 100 ? `Uploading ${uploadProgress}` : `Upload Complete ${uploadProgress}`}
               </div>
             </div>
+          )}
+
 
             <input 
               type="file" 
@@ -92,14 +133,16 @@ const AddProduct = () => {
               onChange={(e) => handleImageChange(e)} 
             />
 
-            <input 
-              type="text" 
-              required 
-              placeholder='Image URL'
-              name="imageURL" 
-              disabled 
-              value={product.imageURL}
-            />
+            {product.imageURL === "" ? null : (
+              <input 
+                type="text" 
+                required 
+                placeholder='Image URL'
+                name="imageURL" 
+                disabled 
+                value={product.imageURL}
+              />
+            )}
         </Card>
 
             <input 
@@ -142,6 +185,7 @@ const AddProduct = () => {
         </Card>
       </form>
     </div>
+    </>
   )
 }
 
