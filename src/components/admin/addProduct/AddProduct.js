@@ -57,15 +57,12 @@ const AddProduct = () => {
       toast.error(error.message);
     }, 
     () => {
-      getDownloadURL(uploadTask.snapshot.ref)
-      .then((downloadURL) => {
+      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setProduct({...product, imageURL: downloadURL})
           toast.message("Image uploaded successfully");
       });
     }
-    );
-
-    
+    );    
   };
 
   const addProduct = (e) => {
