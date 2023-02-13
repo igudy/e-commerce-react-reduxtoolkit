@@ -7,40 +7,25 @@ import styles from './ViewProducts.module.scss';
 import {FaEdit, FaTrashAlt} from 'react-icons/fa';
 import Loader from '../../loader/Loader';
 import { deleteObject, ref } from 'firebase/storage';
-
+import Notiflix from "notiflix";
+import { useDispatch, useSelector } from 'react-redux';
+import { selectProducts, STORE_PRODUCTS } from '../../../redux/slice/productSlice';
+import useFetchCollection from '../../../customHooks/useFetchCollection';
 
 const ViewProducts = () => 
 {
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, isLoading } = useFetchCollection('products');
+  const products = useSelector(selectProducts);
+  
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-      getProducts();
-    }, [])
-
-    const getProducts = () => {
-      setIsLoading(true);
-
-    try{
-      const productRef = collection(db, "products");
-      const q = query(productRef, orderBy("createdAt", "desc"));
-
-      onSnapshot(q, (snapshot) => {
-        // console.log(snapshot.docs);
-        const allProducts = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        console.log(allProducts);
-        setProducts(allProducts);
-        setIsLoading(false);
-      });
-    } catch(error)
-    {
-      setIsLoading(false);
-      toast.error(error.message);
-    }
-  };
+  useEffect (()=> {
+    dispatch(
+      STORE_PRODUCTS({
+        products: data,
+      })
+    );
+  }, [dispatch, data])
 
   const deleteProduct = async(id, imageURL) => {
     try{
@@ -55,6 +40,28 @@ const ViewProducts = () =>
     catch(error){
       toast.error(error.message);
     }
+  }
+
+  const confirmDelete = (id, imageURL) => {
+    Notiflix.Confirm.show(
+      'Delete Product !!!',
+      'You are about to delete this product',
+      'Delete',
+      'Cancel',
+      function okCb() {
+        deleteProduct(id, imageURL);
+      },
+      function cancelCb() {
+        console.log("Delete Cancelled")
+      },
+      {
+        width: '320px',
+        borderRadius: '3px',
+        titleColor: "orangered",
+        okButtonBackground: "orangered",
+        cssAnimationStyle: "zoom",
+      },
+    );
   }
   
   return (
@@ -89,11 +96,12 @@ const ViewProducts = () =>
                     <td>{category}</td>
                     <td>{`$${price}`}</td>
                     <td className={styles.icons}>
-                      <Link to="/admin/add-product">
+                      {/* String interpolation */}
+                      <Link to={`/admin/add-product/${id}`}>
                         <FaEdit size={20} color="green" />
                       </Link>
                       &nbsp;
-                      <FaTrashAlt size={18} color="red" onClick={() => {deleteProduct(id, imageURL)}}/>
+                      <FaTrashAlt size={18} color="red" onClick={() => {confirmDelete(id, imageURL)}}/>
                     </td>
                   </tr>
               )
