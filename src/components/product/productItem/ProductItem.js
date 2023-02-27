@@ -5,15 +5,16 @@ import styles from './ProductItem.module.scss';
 
 const ProductItem = ({product, grid, id, name, price, desc, imageURL}) => {
   const shortenText = (text, n) => {
-    if(text.length > n){
-      const shortenedText = text.substring(0, 20).concat("...");
+    if (text.length > n) {
+      const shortenedText = text.substring(0, n).concat("...");
       return shortenedText;
     }
-  }
+    return text;
+  };
 
   return (
     <Card cardClass={grid ? `${styles.grid}` : `${styles.list}`}>
-      <Link to="/product-details">
+      <Link to={`/product-details/${id}`}>
         <div className={styles.img}>
           <img src={imageURL} alt={name}/>
         </div>
@@ -24,7 +25,7 @@ const ProductItem = ({product, grid, id, name, price, desc, imageURL}) => {
           <p>{`$${price}`}</p>
           <h4>{shortenText(name, 18)}</h4>
         </div>
-      {!grid && <p className={styles.desc}>{shortenText(desc, 500)}</p>}
+      {!grid && <p className={styles.desc}>{shortenText(desc, 300)}</p>}
 
       <button className='--btn --btn-danger'>Add To Cart</button>
 
