@@ -5,6 +5,7 @@ import { Home, Contact, Login, Register, Reset, Admin } from "./pages";
 import {ToastContainer} from 'react-toastify';
 import AdminOnlyRoute from "./components/adminOnlyRoute/AdminOnlyroute";
 import ProductDetails from "./components/product/productDetails/ProductDetails";
+import Cart from "./pages/cart/Cart";
 
 
 function App() {
@@ -24,7 +25,9 @@ function App() {
             <Admin />
           </AdminOnlyRoute>} />
 
-          <Route path="/product-details/:id" element={<ProductDetails />} />
+          <Route path="/cart" element={<Cart />} />
+
+
 
         </Routes>
         <Footer />
